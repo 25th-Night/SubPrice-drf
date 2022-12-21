@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from users.models import User
+import re
 
 class LoginSeiralizer(serializers.Serializer):
 
@@ -27,3 +28,23 @@ class MyPageSerializer(serializers.Serializer):
     phone = serializers.CharField(required=True)
     picture = serializers.ImageField(use_url=True)
     password = serializers.CharField(required=True, write_only=True, style={'input_type': 'password'})
+
+    def validate(self, data):
+        error = {}
+
+        match = "^01([0|1|6|7|8|9])-?([0-9]{3,4})-?([0-9]{4})$"
+        validation = re.compile(match)
+        
+        if validation.match(str(data['phone'])) is None:
+            error["phone"] = "정확한 전화번호를 입력해주세요."
+        
+        match = "^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$"
+        validation = re.compile(match)
+        
+        if validation.match(str(data['password'])) is None:
+            error["password"] = "비밀번호는 하나 이상의 문자, 숫자, 특수문자를 포함하여 8자리 이상으로 작성해주세요."
+
+        if error:
+            raise serializers.ValidationError(error)
+
+        return data

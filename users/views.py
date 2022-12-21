@@ -40,3 +40,12 @@ class MyInfoView(APIView):
         serializer = self.serializer_class(info, many=True)
     
         return Response(serializer.data)
+
+    def put(self, request):
+        info = User.objects.get(email=request.user)
+        serializer = self.serializer_class(info, data=request.data)
+
+        if serializer.is_valid():
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
