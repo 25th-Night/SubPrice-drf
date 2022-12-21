@@ -19,3 +19,11 @@ class LoginSeiralizer(serializers.Serializer):
             raise serializers.ValidationError("잘못된 비밀번호입니다. 다시 확인하세요.")
 
         return data
+
+class MyPageSerializer(serializers.Serializer):
+
+    email = serializers.EmailField(required=True)
+    fullname = serializers.CharField(required=True)
+    phone = serializers.CharField(required=True)
+    picture = serializers.ImageField(use_url=True)
+    password = serializers.CharField(required=True, write_only=True, style={'input_type': 'password'})
