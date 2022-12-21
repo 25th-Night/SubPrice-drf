@@ -7,6 +7,10 @@ from users.models import User
 
 from users.serializers import LoginSeiralizer
 
+
+class SignUpView(APIView):
+    pass
+
 class LoginView(APIView):
 
     serializer_class = LoginSeiralizer
