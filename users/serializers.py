@@ -1,6 +1,11 @@
 from rest_framework import serializers
 from users.models import User
 
+class SignUpSeiralizer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    fullname = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, style={'input_type': 'password'})
+
 class LoginSeiralizer(serializers.Serializer):
 
     email = serializers.EmailField(required=True)
