@@ -5,11 +5,20 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from users.models import User
 
-from users.serializers import LoginSeiralizer
+from users.serializers import LoginSeiralizer, SignUpSeiralizer
 
 
 class SignUpView(APIView):
-    pass
+    serializer_class = SignUpSeiralizer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            return Response(status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
 
