@@ -17,7 +17,16 @@ class SignUpView(APIView):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            return Response(status=status.HTTP_200_OK)
+
+            user = serializer.save()
+
+            token = RefreshToken.for_user(user)
+            refresh = str(token)
+            access = str(token.access_token)
+
+            return Response({
+                'access': access,
+                'refresh': refresh}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):

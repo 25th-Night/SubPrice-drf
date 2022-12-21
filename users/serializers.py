@@ -24,6 +24,17 @@ class SignUpSeiralizer(serializers.Serializer):
 
         return data
 
+    def create(self, validated_data):
+        email = validated_data['email']
+        fullname = validated_data['fullname']
+        password = validated_data['password']
+
+        user = User.objects.create(email=email, fullname=fullname)
+        user.set_password(password)
+        user.save()
+
+        return user
+
 class LoginSeiralizer(serializers.Serializer):
 
     email = serializers.EmailField(required=True)
