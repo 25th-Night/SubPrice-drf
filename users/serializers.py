@@ -48,3 +48,15 @@ class MyPageSerializer(serializers.Serializer):
             raise serializers.ValidationError(error)
 
         return data
+
+    def update(self, instance, validated_data):
+        instance.email  = validated_data.get('email', instance.email)
+        instance.fullname = validated_data.get('fullname',  instance.fullname)
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.picture = validated_data.get('picture', instance.picture)
+        instance.password = validated_data.get('password', instance.password)
+        
+        instance.set_password(instance.password)
+        instance.save()
+
+        return instance
