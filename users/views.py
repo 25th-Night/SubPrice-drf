@@ -2,10 +2,11 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import AllowAny
-from users.models import User
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from users.serializers import LoginSeiralizer
+from users.models import User
+from users.serializers import LoginSeiralizer, MyPageSerializer
 
 class LoginView(APIView):
 
@@ -30,4 +31,12 @@ class LoginView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class MyInfoView(APIView):
-    pass
+    serializer_class = MyPageSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        info = User.objects.filter(email=request.user)
+        serializer = self.serializer_class(info, many=True)
+    
+        return Response(serializer.data)
