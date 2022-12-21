@@ -7,6 +7,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import timedelta
 import json
 import os
 from pathlib import Path
@@ -54,7 +55,10 @@ INSTALLED_APPS = [
     'users',
     'subscriptions',
     'alarms',
-    'django_extensions',
+
+    # DRF
+    "rest_framework",
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -144,3 +148,23 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # 사용자 인증 등을 진행할 때 사용할 모델 선언
 AUTH_USER_MODEL = 'users.User'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated', 
+        'rest_framework.permissions.AllowAny', 
+    ),
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+REST_USE_JWT = True
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+}
