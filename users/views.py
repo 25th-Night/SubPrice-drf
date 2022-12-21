@@ -28,3 +28,6 @@ class LoginView(APIView):
                 'access': access,
                 'refresh': refresh}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class MyInfoView(APIView):
+    pass
