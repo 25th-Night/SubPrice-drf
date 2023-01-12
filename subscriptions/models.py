@@ -16,7 +16,7 @@ class Type(Baseclass):
         (CREDIT, '신용카드'), (CHECK, '체크카드'),
         (ACCOUNT, '계좌이체'), (EASY, '간편결제'), (MOBILE, '휴대폰결제'),
     ]
-    method_type = models.PositiveSmallIntegerField(verbose_name='결제유형', choices=METHOD_TYPE, unique=True)
+    method_type = models.PositiveSmallIntegerField(verbose_name='결제유형', choices=METHOD_TYPE)
     company = models.ManyToManyField('subscriptions.Company', through='Billing', verbose_name="결제사", related_name="type_company")
     
     def __str__(self):
@@ -62,7 +62,7 @@ class Category(Baseclass):
         (OTT, 'OTT'), (MUSIC, '음악'), (BOOK, '도서'), (DISTRIBUTION, '유통'),
         (SOFTWARE, '소프트웨어'), (DELIEVERY, '정기배송'), (RENTAL, '렌탈'),
     ]
-    category_type = models.PositiveSmallIntegerField(verbose_name='카테고리 종류', choices=CATEGORY_TYPE, unique=True)
+    category_type = models.PositiveSmallIntegerField(verbose_name='카테고리 종류', choices=CATEGORY_TYPE)
 
     def __str__(self):
         return self.get_category_type_display()
@@ -73,7 +73,7 @@ class Category(Baseclass):
         
 class Service(Baseclass):
     category = models.ForeignKey(Category, verbose_name='서비스', on_delete=models.CASCADE, related_name='service_category')
-    name = models.CharField(verbose_name='서비스명', max_length=50, unique=True)
+    name = models.CharField(verbose_name='서비스명', max_length=50)
     
     def __str__(self):
         return self.name
