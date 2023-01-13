@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from .serializers import SubscriptionSerializer
 from subscriptions.models import Subscription
 from .permissions import IsOwnerOnly
@@ -58,3 +59,21 @@ class SubscriptionList(APIView):
             return Response({"message": "정상"}, status=status.HTTP_201_CREATED)
         return Response(subscription_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class SubscriptionDetail(APIView):
+    permission_classes = [IsOwnerOnly]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = SubscriptionSerializer
+
+    def get(self, request, pk):
+        subscription = get_object_or_404(Subscription, pk=pk, user=request.user, is_active=1, delete_on=0)
+        serializered_subscription_data = self.serializer_class(subscription).data
+        return Response(serializered_subscription_data, status=status.HTTP_200_OK)
+
+    def put(self, request, pk):
+        subscription = get_object_or_404(Subscription, pk=pk, user=request.user, is_active=1, delete_on=0)
+        self.check_object_permissions(self.request, subscription)
+        subscription_serializer = self.serializer_class(subscription, data=request.data, context={'request': request})
+        if subscription_serializer.is_valid():
+            subscription_serializer.save()
+            return Response(subscription_serializer.data, status=status.HTTP_200_OK)
+        return Response(subscription_serializer.errors, status=status.HTTP_400_BAD_REQUEST)

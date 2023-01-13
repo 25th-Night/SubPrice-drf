@@ -166,3 +166,43 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         )
 
         return subscription
+
+    def update(self, instance, validated_data):
+
+        user = self.context.get("request").user
+
+        plan_id = validated_data["plan"]["id"]
+        method_type = validated_data["billing"]["type"]["method_type"]
+        company_id = validated_data["billing"]["company"]["id"]
+        started_at = validated_data["started_at"]
+        expire_at = validated_data["expire_at"]
+        d_day = validated_data["alarm_subscription"]["d_day"]
+
+        plan = Plan.objects.get(id=plan_id)
+
+        type_object = Type.objects.get(method_type=method_type)
+        company = Company.objects.get(id=company_id)
+
+        billing, is_created = Billing.objects.get_or_create(
+            user = user,
+            type = type_object,
+            company = company
+        )
+        
+        instance.plan = plan
+        instance.billing = billing
+        instance.started_at = started_at
+
+        if expire_at == '':
+            instance.expire_at = None
+        else:
+            instance.expire_at=expire_at
+
+        instance.save()
+
+        alarm, is_created = Alarm.objects.get_or_create(
+            d_day = d_day,
+            subscription = instance,
+        )
+
+        return instance
