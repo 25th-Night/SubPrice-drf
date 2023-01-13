@@ -7,7 +7,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from users.models import User
 from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyPageSerializer
-
+from rest_framework.decorators import api_view,permission_classes
 
 class SignUpView(APIView):
     serializer_class = SignUpSeiralizer
@@ -71,3 +71,19 @@ class MyInfoView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def remove_picture(request):
+    user = User.objects.get(id=request.user.id)
+    user.picture = None
+    user.save()
+    return Response({"message": "정상"}, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def withdrawal(request):
+    user = User.objects.get(id=request.user.id)
+    user.is_active = 0
+    user.save()
+    return Response({"message": "정상"}, status=status.HTTP_200_OK)
