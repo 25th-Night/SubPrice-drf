@@ -169,3 +169,6 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': False,
 }
+
+# csv 파일을 읽어오는 경로 : {"here": "프로젝트 내 static 폴더에서"}
+CSV_READ_FROM = "here"
