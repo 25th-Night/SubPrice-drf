@@ -1,12 +1,17 @@
 from django.shortcuts import get_object_or_404
 from .serializers import SubscriptionSerializer
-from subscriptions.models import Subscription
+from subscriptions.models import Type, Company, Billing, Category, Service, Plan, Subscription
+from alarms.models import Alarm
+from users.models import User
 from .permissions import IsOwnerOnly
 from .paginators import CustomPagination
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.http import JsonResponse
+from rest_framework.decorators import api_view,permission_classes
 
 # Create your views here.
 
@@ -123,3 +128,62 @@ class SubscriptionHistory(APIView):
         target_subscription = subscription_list.filter(id__in=list_selected)
         target_subscription.update(delete_on=1)
         return Response({"message": "정상"}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def category_data(request):
+    category_list = Category.CATEGORY_TYPE
+    return JsonResponse(category_list, safe=False)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def service_data(request):
+    category = request.GET.get('category')
+    if category is None:
+        service_list = list(Service.objects.all().order_by("id").values_list("id", "name"))
+    else:
+        service_list = list(Service.objects.filter(category__category_type=category).values_list('id', 'name'))
+    return JsonResponse(service_list, safe=False)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def plan_data(request):
+    service = request.GET.get('service')
+    if service is None:
+        plan_list = list(Plan.objects.all().order_by("id").values_list("id", "name"))
+    else:
+        plan_list = list(Plan.objects.filter(service=service).values_list('id', 'name'))
+    return JsonResponse(plan_list, safe=False)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def price_data(request):
+    plan_id = request.GET.get('plan')
+    price = Plan.objects.get(id=plan_id).price
+    return JsonResponse(price, safe=False)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def type_data(request):
+    method_type_list = Type.METHOD_TYPE
+    return JsonResponse(method_type_list, safe=False)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def company_data(request):
+    method_type = request.GET.get('method_type')
+    if method_type is None:
+        company_list = list(Company.objects.all().order_by("id").values_list('id', 'company'))
+    else:
+        CREDIT_CARD, CHECK_CARD, ACCOUNT, EASY_PAYMENT, MOBILE_PAYMENT = 1, 2, 3, 4, 5
+        company_type = {CREDIT_CARD:company_list[19:38],CHECK_CARD:company_list[19:37],
+                        ACCOUNT:company_list[0:19], EASY_PAYMENT:company_list[38:52], 
+                        MOBILE_PAYMENT:company_list[45:46] + company_list[52:57]}
+        company_list = company_type[method_type]
+    return JsonResponse(company_list, safe=False)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def dday_data(request):
+    d_day_list = Alarm.DDAY_TYPE
+    return JsonResponse(d_day_list, safe=False)
