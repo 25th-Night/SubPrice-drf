@@ -71,19 +71,20 @@ class MyInfoView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def patch(self, request):
+        picture = request.GET.get('picture', None)
+        if picture == "remove":
+            user = User.objects.get(id=request.user.id)
+            print(user)
+            user.picture = None
+            user.save()
+            return Response({"message": "정상"}, status=status.HTTP_200_OK)
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def remove_picture(request):
-    user = User.objects.get(id=request.user.id)
-    user.picture = None
-    user.save()
-    return Response({"message": "정상"}, status=status.HTTP_200_OK)
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def withdrawal(request):
-    user = User.objects.get(id=request.user.id)
-    user.is_active = 0
-    user.save()
-    return Response({"message": "정상"}, status=status.HTTP_200_OK)
+        withdrawal = request.GET.get('withdrawal', None)
+        if withdrawal == "yes":
+            user = User.objects.get(id=request.user.id)
+            user.is_active = 0
+            user.save()
+            return Response({"message": "정상"}, status=status.HTTP_200_OK)
+        return Response({"message": "비정상"}, status=status.HTTP_400_BAD_REQUEST)
