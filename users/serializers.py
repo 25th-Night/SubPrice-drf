@@ -41,16 +41,24 @@ class LoginSeiralizer(serializers.Serializer):
     password = serializers.CharField(required=True, style={'input_type': 'password'})
     
     def validate(self, data):
+        error = {}
+
         email = data.get('email', None)
         password = data.get('password', None)
 
-        if User.objects.filter(email=email).exists():
-            user = User.objects.get(email=email)
+        user = User.objects.filter(email=email).last()
 
-            if not user.check_password(password):
-                raise serializers.ValidationError("올바른 이메일 주소를 입력해주세요.")
-        else:
-            raise serializers.ValidationError("잘못된 비밀번호입니다. 다시 확인하세요.")
+        if not user:
+            error["email"] = "올바른 이메일 주소를 입력해주세요."
+
+        elif not user.is_active:
+            error["email"] = "탈퇴한 회원입니다."
+
+        elif not user.check_password(password):
+            error["password"] = "잘못된 비밀번호입니다. 다시 확인하세요."
+
+        if error:
+            raise serializers.ValidationError(error)
 
         return data
 
