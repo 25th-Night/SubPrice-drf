@@ -62,9 +62,9 @@ class LoginSeiralizer(serializers.Serializer):
 
         return data
 
-class MyPageSerializer(serializers.Serializer):
+class MyInfoSerializer(serializers.Serializer):
 
-    email = serializers.EmailField(required=True)
+    email = serializers.EmailField(required=False)
     fullname = serializers.CharField(required=True)
     phone = serializers.CharField(required=True)
     picture = serializers.ImageField(use_url=True)
@@ -91,7 +91,6 @@ class MyPageSerializer(serializers.Serializer):
         return data
 
     def update(self, instance, validated_data):
-        instance.email  = validated_data.get('email', instance.email)
         instance.fullname = validated_data.get('fullname',  instance.fullname)
         instance.phone = validated_data.get('phone', instance.phone)
         instance.picture = validated_data.get('picture', instance.picture)
