@@ -4,13 +4,14 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.parsers import FormParser, MultiPartParser, FileUploadParser
 
 from users.models import User
-from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyPageSerializer
+from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyInfoSerializer
 from rest_framework.decorators import api_view,permission_classes
 
 from drf_yasg.utils import swagger_auto_schema
-from users.openapi import login_post, signup_post
+from users.openapi import login_post, signup_post, myinfo_get
 
 class SignUpView(APIView):
     """
@@ -25,8 +26,8 @@ class SignUpView(APIView):
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(
-        operation_summary="회원가입 요청",
-        operation_id='회원가입',
+        operation_summary=signup_post["operation_summary"],
+        operation_id=signup_post["operation_id"],
         request_body=signup_post["request_body"], 
         responses=signup_post["responses"]
     )
@@ -59,8 +60,8 @@ class LoginView(APIView):
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(
-        operation_summary="로그인 요청",
-        operation_id='로그인',
+        operation_summary=login_post["operation_summary"],
+        operation_id=login_post["operation_id"],
         request_body=login_post["request_body"], 
         responses=login_post["responses"]
     )
@@ -81,11 +82,18 @@ class LoginView(APIView):
                 'refresh': refresh}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class MyInfoView(APIView):
-    serializer_class = MyPageSerializer
+    parser_classes = [MultiPartParser]
+    serializer_class = MyInfoSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    
+
+    @swagger_auto_schema(
+        operation_summary=myinfo_get["operation_summary"],
+        operation_id=myinfo_get["operation_id"],
+        responses=myinfo_get["responses"],
+    ) 
     def get(self, request):
         info = User.objects.filter(email=request.user)
         serializer = self.serializer_class(info, many=True)
