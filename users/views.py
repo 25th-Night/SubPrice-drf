@@ -9,10 +9,27 @@ from users.models import User
 from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyPageSerializer
 from rest_framework.decorators import api_view,permission_classes
 
+from drf_yasg.utils import swagger_auto_schema
+from users.openapi import login_post, signup_post
+
 class SignUpView(APIView):
+    """
+        # 회원가입 요청을 위한 API
+        ---
+        ## 내용
+            - email : 이메일 (ID로 사용됨)
+            - fullname : 이름 혹은 별명
+            - password : 비밀번호
+    """
     serializer_class = SignUpSeiralizer
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        operation_summary="회원가입 요청",
+        operation_id='회원가입',
+        request_body=signup_post["request_body"], 
+        responses=signup_post["responses"]
+    )
     def post(self, request):
 
         serializer = self.serializer_class(data=request.data)
@@ -27,14 +44,26 @@ class SignUpView(APIView):
 
             return Response({
                 'access': access,
-                'refresh': refresh}, status=status.HTTP_200_OK)
+                'refresh': refresh}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
-
+    """
+        # 로그인 요청을 위한 API
+        ---
+        ## 내용
+            - email : 이메일 (ID로 사용됨)
+            - password : 비밀번호
+    """
     serializer_class = LoginSeiralizer
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        operation_summary="로그인 요청",
+        operation_id='로그인',
+        request_body=login_post["request_body"], 
+        responses=login_post["responses"]
+    )
     def post(self, request):
 
         serializer = self.serializer_class(data=request.data)
