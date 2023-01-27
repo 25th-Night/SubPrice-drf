@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'subscriptions',
     'alarms',
     'django_extensions',
+    'drf_yasg',
 
     # DRF
     "rest_framework",
