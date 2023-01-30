@@ -1,5 +1,5 @@
 from django.urls import path
-from subscriptions.views import SubscriptionList, SubscriptionDetail, SubscriptionHistory, CategoryListView, ServiceListView, PlanListView, priceData, TypeListView, CompanyListView, dday_data
+from subscriptions.views import SubscriptionList, SubscriptionDetail, SubscriptionHistory, CategoryListView, ServiceListView, PlanListView, priceData, TypeListView, CompanyListView, AlarmListView
 
 urlpatterns = [
     path("main/", SubscriptionList.as_view(), name="subscription_list"),
@@ -11,5 +11,5 @@ urlpatterns = [
     path("price/", priceData, name="price_list"),
     path("method_type/", TypeListView.as_view(), name="method_type_list"),
     path("company/", CompanyListView.as_view(), name="company_list"),
-    path("dday/", dday_data, name="dday_list"),
+    path("dday/", AlarmListView.as_view(), name="dday_list"),
 ]

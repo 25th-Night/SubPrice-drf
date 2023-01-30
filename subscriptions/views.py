@@ -14,7 +14,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get
+from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get
 
 
 # Create your views here.
@@ -297,8 +297,25 @@ class CompanyListView(APIView):
         return Response(serialized_company_list_data, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def dday_data(request):
-    d_day_list = Alarm.DDAY_TYPE
-    return JsonResponse(d_day_list, safe=False)
+class AlarmListView(APIView):
+    """
+        # 메일발송 D-DAY 목록 조회를 위한 API
+        ---
+        ## 내용
+        
+        ### Response body
+            - category_type : 메일발송 D-DAY 분류 No.
+            - name : 메일발송 D-DAY 명칭
+    """
+    serializer_class = AlarmSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary=ddayList_get["operation_summary"],
+        operation_id=ddayList_get["operation_id"],
+        responses=ddayList_get["responses"],
+    ) 
+    def get(self, request):
+        dday_list = [{"d_day":d_day, "name":name} for d_day, name in Alarm.DDAY_TYPE]
+        return JsonResponse(dday_list, status=status.HTTP_200_OK, safe=False)
