@@ -13,7 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from .openapi import categoryList_get, serviceList_get, planList_get
+from .openapi import categoryList_get, serviceList_get, planList_get, price_get
 
 
 # Create your views here.
@@ -218,14 +218,21 @@ class PlanListView(APIView):
             plan_list = Plan.objects.filter(service=service)
         serialized_plan_list_data = self.serializer_class(plan_list, many=True).data
         return Response(serialized_plan_list_data, status=status.HTTP_200_OK)
-        
 
+
+@swagger_auto_schema(
+    method="get",
+    operation_summary=price_get["operation_summary"],
+    operation_id=price_get["operation_id"],
+    manual_parameters=price_get["manual_parameters"],
+    responses=price_get["responses"],
+) 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def price_data(request):
     plan_id = request.GET.get('plan')
     price = Plan.objects.get(id=plan_id).price
-    return JsonResponse(price, safe=False)
+    return JsonResponse({"price":price}, status=status.HTTP_200_OK, safe=False)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
