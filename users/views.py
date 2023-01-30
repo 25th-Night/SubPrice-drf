@@ -18,6 +18,8 @@ class SignUpView(APIView):
         # 회원가입 요청을 위한 API
         ---
         ## 내용
+        
+        ### Request Body
             - email : 이메일 (ID로 사용됨)
             - fullname : 이름 혹은 별명
             - password : 비밀번호
@@ -53,6 +55,8 @@ class LoginView(APIView):
         # 로그인 요청을 위한 API
         ---
         ## 내용
+
+        ### Request Body 
             - email : 이메일 (ID로 사용됨)
             - password : 비밀번호
     """
@@ -84,6 +88,16 @@ class LoginView(APIView):
 
 
 class MyInfoView(APIView):
+    """
+        # 내정보 조회를 위한 API
+        ---
+        ## 내용
+        ### Response Body
+            - email : 이메일 (ID로 사용됨)
+            - fullname : 이름
+            - phone : 휴대전화
+            - picture : 프로필 사진
+    """
     parser_classes = [MultiPartParser]
     serializer_class = MyInfoSerializer
     authentication_classes = [JWTAuthentication]
