@@ -14,7 +14,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get
+from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get
 
 
 # Create your views here.
@@ -144,7 +144,7 @@ class CategoryListView(APIView):
         
         ### Response body
             - category_type : 카테고리 분류 No.
-            - name : 카테고리 분류에 따른 이름
+            - name : 카테고리 이름
     """
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]
@@ -244,7 +244,7 @@ class TypeListView(APIView):
         
         ### Response body
             - method_type : 결제유형 분류 No.
-            - name : 결제유형 분류에 따른 이름
+            - name : 결제유형 이름
     """
     serializer_class = TypeSerializer
     authentication_classes = [JWTAuthentication]
@@ -261,19 +261,41 @@ class TypeListView(APIView):
         return Response(serialized_type_list_data, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def company_data(request):
-    method_type = request.GET.get('method_type')
-    if method_type is None:
-        company_list = list(Company.objects.all().order_by("id").values_list('id', 'company'))
-    else:
-        CREDIT_CARD, CHECK_CARD, ACCOUNT, EASY_PAYMENT, MOBILE_PAYMENT = 1, 2, 3, 4, 5
-        company_type = {CREDIT_CARD:company_list[19:38],CHECK_CARD:company_list[19:37],
-                        ACCOUNT:company_list[0:19], EASY_PAYMENT:company_list[38:52], 
-                        MOBILE_PAYMENT:company_list[45:46] + company_list[52:57]}
-        company_list = company_type[method_type]
-    return JsonResponse(company_list, safe=False)
+class CompanyListView(APIView):
+    """
+        # 서비스 목록 조회를 위한 API
+        ---
+        ## 내용
+        
+        ### Response body
+            - company_id : 결제사 ID
+            - name : 결제사 이름
+    """
+    serializer_class = CompanySerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary=companyList_get["operation_summary"],
+        operation_id=companyList_get["operation_id"],
+        manual_parameters=companyList_get["manual_parameters"],
+        responses=companyList_get["responses"],
+    ) 
+    def get(self, request):
+        method_type = request.GET.get('method_type')
+        if method_type is None:
+            company_list = Company.objects.all()
+        else:
+            company_list = list(Company.objects.all())
+
+            CREDIT_CARD, CHECK_CARD, ACCOUNT, EASY_PAYMENT, MOBILE_PAYMENT = 1, 2, 3, 4, 5
+            company_type = {CREDIT_CARD:company_list[19:38],CHECK_CARD:company_list[19:37],
+                            ACCOUNT:company_list[0:19], EASY_PAYMENT:company_list[38:52], 
+                            MOBILE_PAYMENT:company_list[45:46] + company_list[52:57]}
+            company_list = company_type[int(method_type)]
+        serialized_company_list_data = self.serializer_class(company_list, many=True).data
+        return Response(serialized_company_list_data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

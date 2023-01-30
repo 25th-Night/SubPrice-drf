@@ -20,7 +20,8 @@ class CompanySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
     class Meta:
         model = Company
-        fields = ['id']
+        fields = ['id', 'company']
+        read_only_fields = ['company']
 
 class BillingSerializer(serializers.ModelSerializer):
     type = TypeSerializer(required=True)

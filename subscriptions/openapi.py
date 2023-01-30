@@ -7,6 +7,7 @@ categoryType_list = [category_type[0] for category_type in Category.CATEGORY_TYP
 serviceId_list = list(Service.objects.all().values_list('id', flat=True))
 planId_list = list(Plan.objects.all().values_list('id', flat=True))
 methodType_list = [method_type[0] for method_type in Type.METHOD_TYPE]
+companyId_list = list(Company.objects.all().values_list('id', flat=True))
 
 
 categoryList_get = {
@@ -48,7 +49,7 @@ serviceList_get = {
         openapi.Parameter(
             "category",
             openapi.IN_QUERY,
-            description="**Category Type** : 미입력 시, 전체 서비스 리스트 조회.",
+            description="**Category Type** : 카테고리 Type 입력. 미입력 시, 전체 서비스 리스트 조회.",
             type=openapi.TYPE_NUMBER,
             enum=categoryType_list,
         ),
@@ -63,7 +64,7 @@ serviceList_get = {
                     type=openapi.TYPE_OBJECT,
                     description="서비스 정보",
                     properties = {
-                        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="서비스 분류 No.", title="서비스 종류", enum=serviceId_list),
+                        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="서비스 분류 ID", title="서비스 ID", enum=serviceId_list),
                         'name': openapi.Schema(type=openapi.TYPE_STRING, description="서비스 분류에 따른 이름", title="서비스 이름", ),
                     }
                 )
@@ -89,7 +90,7 @@ planList_get = {
         openapi.Parameter(
             "service",
             openapi.IN_QUERY,
-            description="**Service Id** : 미입력 시, 전체 서비스유형 리스트 조회.",
+            description="**Service Id** : 서비스 ID 입력. 미입력 시, 전체 서비스유형 리스트 조회.",
             type=openapi.TYPE_NUMBER,
             enum=serviceId_list,
         ),
@@ -104,7 +105,7 @@ planList_get = {
                     type=openapi.TYPE_OBJECT,
                     description="서비스유형 정보",
                     properties = {
-                        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="서비스유형 분류 No.", title="서비스유형 종류", enum=planId_list),
+                        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="서비스유형 분류 ID", title="서비스유형 ID", enum=planId_list),
                         'name': openapi.Schema(type=openapi.TYPE_STRING, description="서비스유형 분류에 따른 이름", title="서비스유형 이름", ),
                     }
                 )
@@ -130,7 +131,7 @@ price_get = {
         openapi.Parameter(
             "plan",
             openapi.IN_QUERY,
-            description="**Plan Id** : 해당 데이터 필수 입력 요망",
+            description="**Plan Id** : 서비스유형 ID 입력. 해당 데이터 필수 입력 요망",
             type=openapi.TYPE_NUMBER,
             enum=planId_list,
             required=True,
@@ -174,6 +175,47 @@ typeList_get = {
                     properties = {
                         'method_type': openapi.Schema(type=openapi.TYPE_INTEGER, description="결제유형 분류 No.", title="결제유형 종류", enum=methodType_list),
                         'name': openapi.Schema(type=openapi.TYPE_STRING, description="결제유형 분류에 따른 이름", title="결제유형 이름", ),
+                    }
+                )
+            )
+        ), 
+        400: openapi.Response(
+            description="Bad Request", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                }
+            )
+        )
+    }
+}
+
+
+companyList_get = {
+    "operation_summary" : "결제사 목록 조회",
+    "operation_id" : '결제사',
+    "manual_parameters" : [
+        openapi.Parameter(
+            "method_type",
+            openapi.IN_QUERY,
+            description="**Method Type** : 결제유형 입력. 미입력 시, 전체 결제사 리스트 조회.",
+            type=openapi.TYPE_NUMBER,
+            enum=methodType_list,
+        ),
+    ],
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                description="결제사 리스트",
+                items=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    description="결제사 정보",
+                    properties = {
+                        'id': openapi.Schema(type=openapi.TYPE_INTEGER, description="결제사 분류 ID", title="결제사 ID", enum=companyId_list),
+                        'company': openapi.Schema(type=openapi.TYPE_STRING, description="결제사 분류에 따른 이름", title="결제사 이름", ),
                     }
                 )
             )
