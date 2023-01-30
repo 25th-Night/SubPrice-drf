@@ -47,11 +47,12 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class PlanSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
-    service = ServiceSerializer(required=False)
+    service = ServiceSerializer(required=True, write_only=True)
 
     class Meta:
         model = Plan
-        fields = ['id', 'service']
+        fields = ['id', 'service', 'name']
+        read_only_fields = ['name']
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     plan = PlanSerializer(required=True)
