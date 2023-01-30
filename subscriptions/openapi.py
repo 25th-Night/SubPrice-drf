@@ -6,6 +6,8 @@ from subscriptions.models import Type, Company, Billing, Category, Service, Plan
 categoryType_list = [category_type[0] for category_type in Category.CATEGORY_TYPE]
 serviceId_list = list(Service.objects.all().values_list('id', flat=True))
 planId_list = list(Plan.objects.all().values_list('id', flat=True))
+methodType_list = [method_type[0] for method_type in Type.METHOD_TYPE]
+
 
 categoryList_get = {
     "operation_summary" : "카테고리 목록 조회",
@@ -144,6 +146,38 @@ price_get = {
                 }
             )
         ),
+        400: openapi.Response(
+            description="Bad Request", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                }
+            )
+        )
+    }
+}
+
+
+typeList_get = {
+    "operation_summary" : "결제유형 목록 조회",
+    "operation_id" : '결제유형',
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_ARRAY,
+                description="결제유형 리스트",
+                items=openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    description="결제유형 정보",
+                    properties = {
+                        'method_type': openapi.Schema(type=openapi.TYPE_INTEGER, description="결제유형 분류 No.", title="결제유형 종류", enum=methodType_list),
+                        'name': openapi.Schema(type=openapi.TYPE_STRING, description="결제유형 분류에 따른 이름", title="결제유형 이름", ),
+                    }
+                )
+            )
+        ), 
         400: openapi.Response(
             description="Bad Request", 
             schema=openapi.Schema(

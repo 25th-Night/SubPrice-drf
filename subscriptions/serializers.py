@@ -7,9 +7,14 @@ from alarms.serializers import AlarmSerializer
 import calendar
 
 class TypeSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        name = obj.get_method_type_display()
+        return name
     class Meta:
         model = Type
-        fields = ['method_type']
+        fields = ['method_type', 'name']
 
 class CompanySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)

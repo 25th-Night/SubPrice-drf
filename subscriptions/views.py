@@ -1,10 +1,11 @@
 from django.shortcuts import get_object_or_404
-from .serializers import SubscriptionSerializer, CategorySerializer, ServiceSerializer
+from subscriptions.serializers import SubscriptionSerializer, CategorySerializer, ServiceSerializer, TypeSerializer, CompanySerializer
 from subscriptions.models import Type, Company, Billing, Category, Service, Plan, Subscription
+from alarms.serializers import AlarmSerializer
 from alarms.models import Alarm
 from users.models import User
-from .permissions import IsOwnerOnly
-from .paginators import CustomPagination
+from subscriptions.permissions import IsOwnerOnly
+from subscriptions.paginators import CustomPagination
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,7 +14,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from .openapi import categoryList_get, serviceList_get, planList_get, price_get
+from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get
 
 
 # Create your views here.
@@ -228,17 +229,37 @@ class PlanListView(APIView):
     responses=price_get["responses"],
 ) 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def priceData(request):
     plan_id = request.GET.get('plan')
     price = Plan.objects.get(id=plan_id).price
     return JsonResponse({"price":price}, status=status.HTTP_200_OK, safe=False)
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def type_data(request):
-    method_type_list = Type.METHOD_TYPE
-    return JsonResponse(method_type_list, safe=False)
+
+class TypeListView(APIView):
+    """
+        # 결제유형 목록 조회를 위한 API
+        ---
+        ## 내용
+        
+        ### Response body
+            - method_type : 결제유형 분류 No.
+            - name : 결제유형 분류에 따른 이름
+    """
+    serializer_class = TypeSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary=typeList_get["operation_summary"],
+        operation_id=typeList_get["operation_id"],
+        responses=typeList_get["responses"],
+    ) 
+    def get(self, request):
+        type_list = Type.objects.all()
+        serialized_type_list_data = self.serializer_class(type_list, many=True).data
+        return Response(serialized_type_list_data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
