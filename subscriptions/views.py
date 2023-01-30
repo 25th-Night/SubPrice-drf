@@ -13,7 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from .openapi import category_data_get
+from .openapi import categorylist_get
 
 
 # Create your views here.
@@ -135,29 +135,29 @@ class SubscriptionHistory(APIView):
         return Response({"message": "정상"}, status=status.HTTP_200_OK)
 
 
-@swagger_auto_schema(
-    method="get",
-    operation_summary=category_data_get["operation_summary"],
-    operation_id=category_data_get["operation_id"],
-    responses=category_data_get["responses"],
-) 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def category_data(request):
+class CategoryListView(APIView):
     """
-    # 카테고리 목록 조회를 위한 API
-    ---
-    ## 내용
-    
-    ### Response body
-        - category_type : 카테고리 분류 No.
-        - name : 카테고리 분류에 따른 이름
+        # 카테고리 목록 조회를 위한 API
+        ---
+        ## 내용
+        
+        ### Response body
+            - category_id : 
+            - category_display : 
     """
-    if request.method == "GET":
+    serializer_class = CategorySerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary=categorylist_get["operation_summary"],
+        operation_id=categorylist_get["operation_id"],
+        responses=categorylist_get["responses"],
+    ) 
+    def get(self, request):
         category_list = Category.objects.all()
-        serialized_category_data = CategorySerializer(category_list, many=True).data
+        serialized_category_data = self.serializer_class(category_list, many=True).data
         return Response(serialized_category_data, status=status.HTTP_200_OK)
-    return Response({"message": "잘못된 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
