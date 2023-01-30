@@ -23,7 +23,7 @@ class Command(BaseCommand):
         check_card = pay_company[19:37]
         account = pay_company[0:19]
         easy_payment = pay_company[38:52]
-        mobile_payment = pay_company[52:57]
+        mobile_payment = pay_company[45:46] + pay_company[52:57]
         
         
         # 결제유형 및 결제사 id 랜덤 추출
