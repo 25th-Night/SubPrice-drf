@@ -2,7 +2,7 @@ from drf_yasg import openapi
 from .serializers import CategorySerializer
 
 
-category_data_get = {
+categorylist_get = {
     "method" : "get",
     "operation_summary" : "카테고리 목록 조회",
     "operation_id" : '카테고리',
