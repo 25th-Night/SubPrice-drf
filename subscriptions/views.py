@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from .serializers import SubscriptionSerializer
+from .serializers import SubscriptionSerializer, CategorySerializer
 from subscriptions.models import Type, Company, Billing, Category, Service, Plan, Subscription
 from alarms.models import Alarm
 from users.models import User
@@ -8,10 +8,13 @@ from .paginators import CustomPagination
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
+from drf_yasg.utils import swagger_auto_schema
+from .openapi import category_data_get
+
 
 # Create your views here.
 
@@ -64,6 +67,7 @@ class SubscriptionList(APIView):
             return Response({"message": "정상"}, status=status.HTTP_201_CREATED)
         return Response(subscription_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class SubscriptionDetail(APIView):
     permission_classes = [IsOwnerOnly]
     authentication_classes = [JWTAuthentication]
@@ -82,6 +86,7 @@ class SubscriptionDetail(APIView):
             subscription_serializer.save()
             return Response(subscription_serializer.data, status=status.HTTP_200_OK)
         return Response(subscription_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SubscriptionHistory(APIView):
     permission_classes = [IsOwnerOnly]
@@ -129,11 +134,31 @@ class SubscriptionHistory(APIView):
         target_subscription.update(delete_on=1)
         return Response({"message": "정상"}, status=status.HTTP_200_OK)
 
+
+@swagger_auto_schema(
+    method="get",
+    operation_summary=category_data_get["operation_summary"],
+    operation_id=category_data_get["operation_id"],
+    responses=category_data_get["responses"],
+) 
 @api_view(['GET'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticated])
 def category_data(request):
-    category_list = Category.CATEGORY_TYPE
-    return JsonResponse(category_list, safe=False)
+    """
+    # 카테고리 목록 조회를 위한 API
+    ---
+    ## 내용
+    
+    ### Response body
+        - category_type : 카테고리 분류 No.
+        - name : 카테고리 분류에 따른 이름
+    """
+    if request.method == "GET":
+        category_list = Category.objects.all()
+        serialized_category_data = CategorySerializer(category_list, many=True).data
+        return Response(serialized_category_data, status=status.HTTP_200_OK)
+    return Response({"message": "잘못된 요청입니다."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
