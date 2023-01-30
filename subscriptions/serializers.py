@@ -26,9 +26,15 @@ class BillingSerializer(serializers.ModelSerializer):
         fields = ['id', 'type', 'company']
 
 class CategorySerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        name = obj.get_category_type_display()
+        return name
+
     class Meta:
         model = Category
-        fields = ['category_type']
+        fields = ['category_type', 'name']
 
 class ServiceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
