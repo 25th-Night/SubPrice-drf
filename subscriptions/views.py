@@ -13,7 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from .openapi import categoryList_get, serviceList_get
+from .openapi import categoryList_get, serviceList_get, planList_get
 
 
 # Create your views here.
@@ -182,7 +182,7 @@ class ServiceListView(APIView):
     ) 
     def get(self, request):
         category = request.GET.get('category')
-        if category == "All":
+        if category is None:
             service_list = Service.objects.all()
         else:
             service_list = Service.objects.filter(category__category_type=category)
@@ -190,25 +190,35 @@ class ServiceListView(APIView):
         return Response(serialized_service_list_data, status=status.HTTP_200_OK)
 
 
-# @api_view(['GET'])
-# @permission_classes([AllowAny])
-# def service_data(request):
-#     category = request.GET.get('category')
-#     if category is None:
-#         service_list = list(Service.objects.all().order_by("id").values_list("id", "name"))
-#     else:
-#         service_list = list(Service.objects.filter(category__category_type=category).values_list('id', 'name'))
-#     return JsonResponse(service_list, safe=False)
+class PlanListView(APIView):
+    """
+        # 서비스유형 목록 조회를 위한 API
+        ---
+        ## 내용
+        
+        ### Response body
+            - service_id : 서비스유형 ID
+            - name : 서비스유형 이름
+    """
+    serializer_class = ServiceSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def plan_data(request):
-    service = request.GET.get('service')
-    if service is None:
-        plan_list = list(Plan.objects.all().order_by("id").values_list("id", "name"))
-    else:
-        plan_list = list(Plan.objects.filter(service=service).values_list('id', 'name'))
-    return JsonResponse(plan_list, safe=False)
+    @swagger_auto_schema(
+        operation_summary=planList_get["operation_summary"],
+        operation_id=planList_get["operation_id"],
+        manual_parameters=planList_get["manual_parameters"],
+        responses=planList_get["responses"],
+    ) 
+    def get(self, request):
+        service = request.GET.get('service')
+        if service is None:
+            plan_list = Plan.objects.all()
+        else:
+            plan_list = Plan.objects.filter(service=service)
+        serialized_plan_list_data = self.serializer_class(plan_list, many=True).data
+        return Response(serialized_plan_list_data, status=status.HTTP_200_OK)
+        
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
