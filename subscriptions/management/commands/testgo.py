@@ -25,15 +25,23 @@ class Command(BaseCommand):
         # print("------")
         # print(PLAN_TYPE)
 
-        company_list = list(Company.objects.all().values_list('id', flat=True))
-        print(company_list)
-        credit_card = company_list[19:38]
-        check_card = company_list[19:37]
-        account = company_list[:19]
-        easy_payment = company_list[38:52]
-        mobile_payment = company_list[45:46] + company_list[52:57]
-        print(credit_card)
-        print(check_card)
-        print(account)
-        print(easy_payment)
-        print(mobile_payment)
+        # company_list = list(Company.objects.all().values_list('id', flat=True))
+        # print(company_list)
+        # credit_card = company_list[19:38]
+        # check_card = company_list[19:37]
+        # account = company_list[:19]
+        # easy_payment = company_list[38:52]
+        # mobile_payment = company_list[45:46] + company_list[52:57]
+        # print(credit_card)
+        # print(check_card)
+        # print(account)
+        # print(easy_payment)
+        # print(mobile_payment)
+
+        categoryType_list=Category.CATEGORY_TYPE
+        print(categoryType_list)
+        a = [category_type[0] for category_type in categoryType_list]
+        print(a)
+
+        serviceId_list = Service.objects.all().values_list('id', flat=True)
+        print(serviceId_list)

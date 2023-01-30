@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-from .serializers import SubscriptionSerializer, CategorySerializer
+from .serializers import SubscriptionSerializer, CategorySerializer, ServiceSerializer
 from subscriptions.models import Type, Company, Billing, Category, Service, Plan, Subscription
 from alarms.models import Alarm
 from users.models import User
@@ -13,7 +13,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from .openapi import categorylist_get
+from .openapi import categoryList_get, serviceList_get
 
 
 # Create your views here.
@@ -142,33 +142,63 @@ class CategoryListView(APIView):
         ## 내용
         
         ### Response body
-            - category_id : 
-            - category_display : 
+            - category_type : 카테고리 분류 No.
+            - name : 카테고리 분류에 따른 이름
     """
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary=categorylist_get["operation_summary"],
-        operation_id=categorylist_get["operation_id"],
-        responses=categorylist_get["responses"],
+        operation_summary=categoryList_get["operation_summary"],
+        operation_id=categoryList_get["operation_id"],
+        responses=categoryList_get["responses"],
     ) 
     def get(self, request):
         category_list = Category.objects.all()
-        serialized_category_data = self.serializer_class(category_list, many=True).data
-        return Response(serialized_category_data, status=status.HTTP_200_OK)
+        serialized_category_list_data = self.serializer_class(category_list, many=True).data
+        return Response(serialized_category_list_data, status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
-@permission_classes([AllowAny])
-def service_data(request):
-    category = request.GET.get('category')
-    if category is None:
-        service_list = list(Service.objects.all().order_by("id").values_list("id", "name"))
-    else:
-        service_list = list(Service.objects.filter(category__category_type=category).values_list('id', 'name'))
-    return JsonResponse(service_list, safe=False)
+class ServiceListView(APIView):
+    """
+        # 서비스 목록 조회를 위한 API
+        ---
+        ## 내용
+        
+        ### Response body
+            - service_id : 서비스 ID
+            - name : 서비스명
+    """
+    serializer_class = ServiceSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_summary=serviceList_get["operation_summary"],
+        operation_id=serviceList_get["operation_id"],
+        manual_parameters=serviceList_get["manual_parameters"],
+        responses=serviceList_get["responses"],
+    ) 
+    def get(self, request):
+        category = request.GET.get('category')
+        if category == "All":
+            service_list = Service.objects.all()
+        else:
+            service_list = Service.objects.filter(category__category_type=category)
+        serialized_service_list_data = self.serializer_class(service_list, many=True).data
+        return Response(serialized_service_list_data, status=status.HTTP_200_OK)
+
+
+# @api_view(['GET'])
+# @permission_classes([AllowAny])
+# def service_data(request):
+#     category = request.GET.get('category')
+#     if category is None:
+#         service_list = list(Service.objects.all().order_by("id").values_list("id", "name"))
+#     else:
+#         service_list = list(Service.objects.filter(category__category_type=category).values_list('id', 'name'))
+#     return JsonResponse(service_list, safe=False)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
