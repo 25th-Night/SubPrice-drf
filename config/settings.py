@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'subscriptions',
     'alarms',
     'django_extensions',
+    'drf_yasg',
 
     # DRF
     "rest_framework",
@@ -159,6 +160,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+
 }
 
 REST_USE_JWT = True
@@ -172,3 +174,22 @@ SIMPLE_JWT = {
 
 # csv 파일을 읽어오는 경로 : {"here": "프로젝트 내 static 폴더에서"}
 CSV_READ_FROM = "here"
+
+
+# SWAGGER 설정
+SWAGGER_SETTINGS = {
+    "DEFAULT_MODEL_RENDERING": "example",
+    'DOC_EXPANSION': 'list',
+    'APIS_SORTER': 'alpha',
+    'USE_SESSION_AUTH': False,
+   'SECURITY_DEFINITIONS': {
+      'Basic': {
+            'type': 'basic'
+      },
+      'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+      }
+   }
+}

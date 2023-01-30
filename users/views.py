@@ -4,15 +4,35 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.parsers import FormParser, MultiPartParser, FileUploadParser
 
 from users.models import User
-from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyPageSerializer
+from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyInfoSerializer
 from rest_framework.decorators import api_view,permission_classes
 
+from drf_yasg.utils import swagger_auto_schema
+from users.openapi import login_post, signup_post, myinfo_get
+
 class SignUpView(APIView):
+    """
+        # 회원가입 요청을 위한 API
+        ---
+        ## 내용
+        
+        ### Request Body
+            - email : 이메일 (ID로 사용됨)
+            - fullname : 이름 혹은 별명
+            - password : 비밀번호
+    """
     serializer_class = SignUpSeiralizer
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        operation_summary=signup_post["operation_summary"],
+        operation_id=signup_post["operation_id"],
+        request_body=signup_post["request_body"], 
+        responses=signup_post["responses"]
+    )
     def post(self, request):
 
         serializer = self.serializer_class(data=request.data)
@@ -27,14 +47,28 @@ class SignUpView(APIView):
 
             return Response({
                 'access': access,
-                'refresh': refresh}, status=status.HTTP_200_OK)
+                'refresh': refresh}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
+    """
+        # 로그인 요청을 위한 API
+        ---
+        ## 내용
 
+        ### Request Body 
+            - email : 이메일 (ID로 사용됨)
+            - password : 비밀번호
+    """
     serializer_class = LoginSeiralizer
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        operation_summary=login_post["operation_summary"],
+        operation_id=login_post["operation_id"],
+        request_body=login_post["request_body"], 
+        responses=login_post["responses"]
+    )
     def post(self, request):
 
         serializer = self.serializer_class(data=request.data)
@@ -52,11 +86,28 @@ class LoginView(APIView):
                 'refresh': refresh}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class MyInfoView(APIView):
-    serializer_class = MyPageSerializer
+    """
+        # 내정보 조회를 위한 API
+        ---
+        ## 내용
+        ### Response Body
+            - email : 이메일 (ID로 사용됨)
+            - fullname : 이름
+            - phone : 휴대전화
+            - picture : 프로필 사진
+    """
+    parser_classes = [MultiPartParser]
+    serializer_class = MyInfoSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-    
+
+    @swagger_auto_schema(
+        operation_summary=myinfo_get["operation_summary"],
+        operation_id=myinfo_get["operation_id"],
+        responses=myinfo_get["responses"],
+    ) 
     def get(self, request):
         info = User.objects.filter(email=request.user)
         serializer = self.serializer_class(info, many=True)
@@ -71,19 +122,20 @@ class MyInfoView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def patch(self, request):
+        picture = request.GET.get('picture', None)
+        if picture == "remove":
+            user = User.objects.get(id=request.user.id)
+            print(user)
+            user.picture = None
+            user.save()
+            return Response({"message": "정상"}, status=status.HTTP_200_OK)
 
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def remove_picture(request):
-    user = User.objects.get(id=request.user.id)
-    user.picture = None
-    user.save()
-    return Response({"message": "정상"}, status=status.HTTP_200_OK)
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def withdrawal(request):
-    user = User.objects.get(id=request.user.id)
-    user.is_active = 0
-    user.save()
-    return Response({"message": "정상"}, status=status.HTTP_200_OK)
+        withdrawal = request.GET.get('withdrawal', None)
+        if withdrawal == "yes":
+            user = User.objects.get(id=request.user.id)
+            user.is_active = 0
+            user.save()
+            return Response({"message": "정상"}, status=status.HTTP_200_OK)
+        return Response({"message": "비정상"}, status=status.HTTP_400_BAD_REQUEST)
