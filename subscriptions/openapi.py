@@ -119,3 +119,39 @@ planList_get = {
         )
     }
 }
+
+
+price_get = {
+    "operation_summary" : "서비스유형 구독료 조회",
+    "operation_id" : '서비스유형 구독료',
+    "manual_parameters" : [
+        openapi.Parameter(
+            "plan",
+            openapi.IN_QUERY,
+            description="**Plan Id** : 해당 데이터 필수 입력 요망",
+            type=openapi.TYPE_NUMBER,
+            enum=planId_list,
+            required=True,
+        ),
+    ],
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'price': openapi.Schema(type=openapi.TYPE_INTEGER, description="서비스유형에 따른 월 구독료", title="서비스유형 구독료"),
+                }
+            )
+        ),
+        400: openapi.Response(
+            description="Bad Request", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                }
+            )
+        )
+    }
+}
