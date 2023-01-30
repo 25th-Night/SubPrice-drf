@@ -38,11 +38,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ServiceSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
-    category = CategorySerializer(required=True)
+    category = CategorySerializer(required=True, write_only=True)
 
     class Meta:
         model = Service
-        fields = ['id', 'category']
+        fields = ['id', 'category', 'name']
+        read_only_fields = ['name']
 
 class PlanSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
