@@ -7,15 +7,21 @@ from alarms.serializers import AlarmSerializer
 import calendar
 
 class TypeSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    def get_name(self, obj):
+        name = obj.get_method_type_display()
+        return name
     class Meta:
         model = Type
-        fields = ['method_type']
+        fields = ['method_type', 'name']
 
 class CompanySerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
     class Meta:
         model = Company
-        fields = ['id']
+        fields = ['id', 'company']
+        read_only_fields = ['company']
 
 class BillingSerializer(serializers.ModelSerializer):
     type = TypeSerializer(required=True)
@@ -47,11 +53,12 @@ class ServiceSerializer(serializers.ModelSerializer):
 
 class PlanSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=True)
-    service = ServiceSerializer(required=False)
+    service = ServiceSerializer(required=True, write_only=True)
 
     class Meta:
         model = Plan
-        fields = ['id', 'service']
+        fields = ['id', 'service', 'name']
+        read_only_fields = ['name']
 
 class SubscriptionSerializer(serializers.ModelSerializer):
     plan = PlanSerializer(required=True)
