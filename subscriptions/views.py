@@ -229,7 +229,7 @@ class PlanListView(APIView):
 ) 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def price_data(request):
+def priceData(request):
     plan_id = request.GET.get('plan')
     price = Plan.objects.get(id=plan_id).price
     return JsonResponse({"price":price}, status=status.HTTP_200_OK, safe=False)
