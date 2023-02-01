@@ -14,8 +14,8 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get
-
+from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get, subscriptionList_get
+from config.utils import CustomSwaggerAutoSchema
 
 # Create your views here.
 
@@ -24,7 +24,7 @@ class SubscriptionList(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = SubscriptionSerializer
     pagination_class = CustomPagination
-
+    
     @property
     def paginator(self):
         if not hasattr(self, '_paginator'):
@@ -32,6 +32,7 @@ class SubscriptionList(APIView):
                 self._paginator = None
             else:
                 self._paginator = self.pagination_class()
+                self._paginator.set_page_size(5)
         return self._paginator
 
     def paginate_queryset(self, queryset):
@@ -43,7 +44,22 @@ class SubscriptionList(APIView):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
 
+    @swagger_auto_schema(
+        operation_summary=subscriptionList_get["operation_summary"],
+        operation_id=subscriptionList_get["operation_id"],
+        manual_parameters=subscriptionList_get["manual_parameters"],
+        responses=subscriptionList_get["responses"],
+        paginator=pagination_class()
+    ) 
     def get(self, request):
+        """
+            # 구독정보 조회를 위한 API
+            ---
+            ## 내용
+            
+            ### Response body
+                - subscription : 구독정보
+        """
         ing = self.request.GET.get('ing', None)
 
         if ing == "y":
@@ -102,6 +118,7 @@ class SubscriptionHistory(APIView):
                 self._paginator = None
             else:
                 self._paginator = self.pagination_class()
+                self._paginator.set_page_size(10)
         return self._paginator
 
     def paginate_queryset(self, queryset):
@@ -122,7 +139,7 @@ class SubscriptionHistory(APIView):
         page = self.paginate_queryset(subscription_list)
         if page is not None:
             serializered_subscription_data = self.serializer_class(page, many=True).data
-            return self.get_paginated_response(serializered_subscription_data.data)
+            return self.get_paginated_response(serializered_subscription_data)
 
         serializered_subscription_data = self.serializer_class(subscription_list, many=True).data
         return Response(serializered_subscription_data, status=status.HTTP_200_OK)
