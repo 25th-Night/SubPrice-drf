@@ -231,6 +231,14 @@ class PlanListView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def priceData(request):
+    """
+        # 서비스유형 가격 조회를 위한 API
+        ---
+        ## 내용
+        
+        ### Response body
+            - price : 서비스유형 가격
+    """
     plan_id = request.GET.get('plan')
     price = Plan.objects.get(id=plan_id).price
     return JsonResponse({"price":price}, status=status.HTTP_200_OK, safe=False)
