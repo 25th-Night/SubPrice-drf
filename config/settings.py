@@ -182,14 +182,15 @@ SWAGGER_SETTINGS = {
     'DOC_EXPANSION': 'list',
     'APIS_SORTER': 'alpha',
     'USE_SESSION_AUTH': False,
-   'SECURITY_DEFINITIONS': {
-      'Basic': {
+    'SECURITY_DEFINITIONS': {
+        'Basic': {
             'type': 'basic'
-      },
-      'Bearer': {
+        },
+        'Bearer': {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
-      }
-   }
+        }
+    },
+    'DEFAULT_AUTO_SCHEMA_CLASS': 'config.utils.CustomSwaggerAutoSchema',
 }

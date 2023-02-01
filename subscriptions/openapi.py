@@ -1,5 +1,6 @@
 from drf_yasg import openapi
-from subscriptions.serializers import CategorySerializer
+
+from subscriptions.serializers import SubscriptionSerializer
 from subscriptions.models import Type, Company, Billing, Category, Service, Plan, Subscription
 from alarms.models import Alarm
 
@@ -51,8 +52,9 @@ serviceList_get = {
         openapi.Parameter(
             "category",
             openapi.IN_QUERY,
-            description="**Category Type** : 카테고리 Type 입력. 미입력 시, 전체 서비스 리스트 조회.",
-            type=openapi.TYPE_NUMBER,
+            description="**Category Type** : 카테고리 Type 입력. 미입력 시, 전체 서비스 리스트 조회.  <br>\
+                        - 참고 : [Category(카테고리) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=0?usp=share_link) ",
+            type=openapi.TYPE_INTEGER,
             enum=categoryType_list,
         ),
     ],
@@ -92,8 +94,9 @@ planList_get = {
         openapi.Parameter(
             "service",
             openapi.IN_QUERY,
-            description="**Service Id** : 서비스 ID 입력. 미입력 시, 전체 서비스유형 리스트 조회.",
-            type=openapi.TYPE_NUMBER,
+            description="**Service Id** : 서비스 ID 입력. 미입력 시, 전체 서비스유형 리스트 조회.  <br>\
+                        - 참고 : [Service(서비스) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=32248500?usp=share_link) ",
+            type=openapi.TYPE_INTEGER,
             enum=serviceId_list,
         ),
     ],
@@ -133,8 +136,9 @@ price_get = {
         openapi.Parameter(
             "plan",
             openapi.IN_QUERY,
-            description="**Plan Id** : 서비스유형 ID 입력. 해당 데이터 필수 입력 요망",
-            type=openapi.TYPE_NUMBER,
+            description="**Plan Id** : 서비스유형 ID 입력. 해당 데이터 필수 입력 요망,  <br>\
+                        - 참고 : [Plan(서비스유형) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=1831498595?usp=share_link) ",
+            type=openapi.TYPE_INTEGER,
             enum=planId_list,
             required=True,
         ),
@@ -201,8 +205,9 @@ companyList_get = {
         openapi.Parameter(
             "method_type",
             openapi.IN_QUERY,
-            description="**Method Type** : 결제유형 입력. 미입력 시, 전체 결제사 리스트 조회.",
-            type=openapi.TYPE_NUMBER,
+            description="**Method Type** : 결제유형 입력. 미입력 시, 전체 결제사 리스트 조회.  <br>\
+                        - 참고 : [Type(결제유형) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=135446740?usp=share_link) ",
+            type=openapi.TYPE_INTEGER,
             enum=methodType_list,
         ),
     ],
@@ -254,6 +259,46 @@ ddayList_get = {
                 )
             )
         ), 
+        400: openapi.Response(
+            description="Bad Request", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                }
+            )
+        )
+    }
+}
+
+
+subscriptionList_get = {
+    "operation_summary" : "구독정보 목록 조회",
+    "operation_id" : '구독정보',
+    "manual_parameters" : [
+        openapi.Parameter(
+            "ing",
+            openapi.IN_QUERY,
+            description="**현재 구독 여부** <br> \
+                        - `y` 입력 : 구독 중인 서비스 조회  <br>\
+                        - `n` 입력 : 구독 만료된 서비스 조회 ",
+            type=openapi.TYPE_STRING,
+            enum=["y","n"],
+            required=True,
+        ),
+        openapi.Parameter(
+            "page",
+            openapi.IN_QUERY,
+            description="**표시할 페이지 No.**",
+            type=openapi.TYPE_INTEGER,
+            required=True,
+        ),
+    ],
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=SubscriptionSerializer(many=True),
+        ),
         400: openapi.Response(
             description="Bad Request", 
             schema=openapi.Schema(
