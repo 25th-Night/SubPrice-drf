@@ -51,7 +51,8 @@ serviceList_get = {
         openapi.Parameter(
             "category",
             openapi.IN_QUERY,
-            description="**Category Type** : 카테고리 Type 입력. 미입력 시, 전체 서비스 리스트 조회.",
+            description="**Category Type** : 카테고리 Type 입력. 미입력 시, 전체 서비스 리스트 조회.  <br>\
+                        - 참고 : [Category(카테고리) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=0?usp=share_link) ",
             type=openapi.TYPE_NUMBER,
             enum=categoryType_list,
         ),
@@ -92,7 +93,8 @@ planList_get = {
         openapi.Parameter(
             "service",
             openapi.IN_QUERY,
-            description="**Service Id** : 서비스 ID 입력. 미입력 시, 전체 서비스유형 리스트 조회.",
+            description="**Service Id** : 서비스 ID 입력. 미입력 시, 전체 서비스유형 리스트 조회.  <br>\
+                        - 참고 : [Service(서비스) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=32248500?usp=share_link) ",
             type=openapi.TYPE_NUMBER,
             enum=serviceId_list,
         ),
@@ -133,7 +135,8 @@ price_get = {
         openapi.Parameter(
             "plan",
             openapi.IN_QUERY,
-            description="**Plan Id** : 서비스유형 ID 입력. 해당 데이터 필수 입력 요망",
+            description="**Plan Id** : 서비스유형 ID 입력. 해당 데이터 필수 입력 요망,  <br>\
+                        - 참고 : [Plan(서비스유형) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=1831498595?usp=share_link) ",
             type=openapi.TYPE_NUMBER,
             enum=planId_list,
             required=True,
@@ -201,7 +204,8 @@ companyList_get = {
         openapi.Parameter(
             "method_type",
             openapi.IN_QUERY,
-            description="**Method Type** : 결제유형 입력. 미입력 시, 전체 결제사 리스트 조회.",
+            description="**Method Type** : 결제유형 입력. 미입력 시, 전체 결제사 리스트 조회.  <br>\
+                        - 참고 : [Type(결제유형) 목록](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=135446740?usp=share_link) ",
             type=openapi.TYPE_NUMBER,
             enum=methodType_list,
         ),
