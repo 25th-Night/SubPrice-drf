@@ -14,7 +14,10 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.http import JsonResponse
 from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
-from subscriptions.openapi import categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get, subscriptionList_get
+from subscriptions.openapi import (
+    categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get, 
+    subscriptionList_get, subscriptionDetail_get, historyList_get
+)
 from config.utils import CustomSwaggerAutoSchema
 
 # Create your views here.
@@ -90,7 +93,21 @@ class SubscriptionDetail(APIView):
     authentication_classes = [JWTAuthentication]
     serializer_class = SubscriptionSerializer
 
+    @swagger_auto_schema(
+        operation_summary=subscriptionDetail_get["operation_summary"],
+        operation_id=subscriptionDetail_get["operation_id"],
+        manual_parameters=subscriptionDetail_get["manual_parameters"],
+        responses=subscriptionDetail_get["responses"]
+    ) 
     def get(self, request, pk):
+        """
+            # 단일 구독정보 조회를 위한 API
+            ---
+            ## 내용
+            
+            ### Response body
+                - subscription : 구독정보
+        """
         subscription = get_object_or_404(Subscription, pk=pk, user=request.user, is_active=1, delete_on=0)
         serializered_subscription_data = self.serializer_class(subscription).data
         return Response(serializered_subscription_data, status=status.HTTP_200_OK)
@@ -130,7 +147,22 @@ class SubscriptionHistory(APIView):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
 
+    @swagger_auto_schema(
+        operation_summary=historyList_get["operation_summary"],
+        operation_id=historyList_get["operation_id"],
+        manual_parameters=historyList_get["manual_parameters"],
+        responses=historyList_get["responses"],
+        paginator=pagination_class()
+    ) 
     def get(self, request):
+        """
+            # 구독내역 조회를 위한 API
+            ---
+            ## 내용
+            
+            ### Response body
+                - subscription : 구독정보
+        """
         sub_list = Subscription.objects.select_related('user', 'plan', 'billing', 'alarm_subscription').filter(user=request.user, delete_on=0)
         sub_now = list(sub_list.filter(is_active=1))
         sub_now.sort(key=lambda x: x.next_billing_at(), reverse=True)
