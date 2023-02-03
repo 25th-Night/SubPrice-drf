@@ -4,12 +4,52 @@ from subscriptions.serializers import SubscriptionSerializer
 from subscriptions.models import Type, Company, Billing, Category, Service, Plan, Subscription
 from alarms.models import Alarm
 
+import csv
+import pandas as pd
+import boto3
+import io
+
+from django.conf import settings
+
+
+target_list = ["company.csv", "service.csv", "plan.csv"]
+data_list = []
+
+if settings.CSV_READ_FROM == 'here':
+    
+    BASE_DIR = './static/csv/'
+    
+    csv_list = []
+
+    for target in target_list:
+        csv_path = BASE_DIR + target
+        csv_list.append(csv_path)
+
+    for csv_file in csv_list:
+        with open(csv_file, 'rt', encoding='UTF8') as f:
+            dr = csv.DictReader(f)
+            data_list.append(pd.DataFrame(dr))
+
+elif settings.CSV_READ_FROM == 's3':
+
+    aws_access_key_id = settings.AWS_ACCESS_KEY_ID
+    aws_secret_access_key = settings.AWS_SECRET_ACCESS_KEY
+    region_name = settings.AWS_REGION
+
+    s3_client = boto3.client(service_name="s3", aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key, region_name=region_name)
+
+    for i in range(3):
+        obj = s3_client.get_object(Bucket="subprice", Key="static/csv/" + target_list[i])
+        data_list.append(pd.read_csv(io.BytesIO(obj["Body"].read())))
+
+company_data, service_data, plan_data = data_list[0], data_list[1], data_list[2]
+    
 
 categoryType_list = [category_type[0] for category_type in Category.CATEGORY_TYPE]
-serviceId_list = list(Service.objects.all().values_list('id', flat=True))
-planId_list = list(Plan.objects.all().values_list('id', flat=True))
+serviceId_list = list(service_data.index)
+planId_list = list(company_data.index)
 methodType_list = [method_type[0] for method_type in Type.METHOD_TYPE]
-companyId_list = list(Company.objects.all().values_list('id', flat=True))
+companyId_list = list(plan_data.index)
 ddayType_list = [dday_type[0] for dday_type in Alarm.DDAY_TYPE]
 
 
