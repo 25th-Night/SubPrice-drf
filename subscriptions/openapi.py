@@ -43,13 +43,15 @@ elif settings.CSV_READ_FROM == 's3':
         data_list.append(pd.read_csv(io.BytesIO(obj["Body"].read())))
 
 company_data, service_data, plan_data = data_list[0], data_list[1], data_list[2]
-    
+
+
 
 categoryType_list = [category_type[0] for category_type in Category.CATEGORY_TYPE]
-serviceId_list = list(service_data.index)
-planId_list = list(company_data.index)
+# serviceId_list = service_data[service_data.columns[0]].to_list()
+serviceId_list = list(map(int,service_data[service_data.columns[0]]))
+planId_list = plan_data[plan_data.columns[0]].to_list()
 methodType_list = [method_type[0] for method_type in Type.METHOD_TYPE]
-companyId_list = list(plan_data.index)
+companyId_list = company_data[company_data.columns[0]].to_list()
 ddayType_list = [dday_type[0] for dday_type in Alarm.DDAY_TYPE]
 
 
