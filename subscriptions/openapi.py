@@ -78,7 +78,7 @@ categoryList_get = {
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
                 }
             )
         )
@@ -120,7 +120,7 @@ serviceList_get = {
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
                 }
             )
         )
@@ -162,7 +162,7 @@ planList_get = {
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
                 }
             )
         )
@@ -231,7 +231,7 @@ typeList_get = {
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
                 }
             )
         )
@@ -273,7 +273,7 @@ companyList_get = {
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
                 }
             )
         )
@@ -305,7 +305,7 @@ ddayList_get = {
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
                 }
             )
         )
@@ -340,18 +340,47 @@ subscriptionList_get = {
             description="Success", 
             schema=SubscriptionSerializer(many=True),
         ),
-        400: openapi.Response(
-            description="Bad Request", 
+        404: openapi.Response(
+            description="Not Found", 
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="찾을 수 없습니다."),
                 }
             )
         )
     }
 }
 
+
+subscriptionDetail_get = {
+    "operation_summary" : "구독정보 조회",
+    "operation_id" : '단일 구독정보',
+    "manual_parameters" : [
+        openapi.Parameter(
+            "page",
+            openapi.IN_PATH,
+            description="**구독정보 ID**",
+            type=openapi.TYPE_INTEGER,
+            required=True,
+        ),
+    ],
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=SubscriptionSerializer,
+        ),
+        400: openapi.Response(
+            description="Bad Request", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
+                }
+            )
+        )
+    }
+}
 
 
 historyList_get = {
@@ -376,7 +405,7 @@ historyList_get = {
             schema=openapi.Schema(
                 type=openapi.TYPE_OBJECT,
                 properties={
-                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
                 }
             )
         )
