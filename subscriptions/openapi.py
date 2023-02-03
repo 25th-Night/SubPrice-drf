@@ -47,7 +47,6 @@ company_data, service_data, plan_data = data_list[0], data_list[1], data_list[2]
 
 
 categoryType_list = [category_type[0] for category_type in Category.CATEGORY_TYPE]
-# serviceId_list = service_data[service_data.columns[0]].to_list()
 serviceId_list = list(map(int,service_data[service_data.columns[0]]))
 planId_list = plan_data[plan_data.columns[0]].to_list()
 methodType_list = [method_type[0] for method_type in Type.METHOD_TYPE]
@@ -328,6 +327,37 @@ subscriptionList_get = {
             enum=["y","n"],
             required=True,
         ),
+        openapi.Parameter(
+            "page",
+            openapi.IN_QUERY,
+            description="**표시할 페이지 No.**",
+            type=openapi.TYPE_INTEGER,
+            required=True,
+        ),
+    ],
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=SubscriptionSerializer(many=True),
+        ),
+        400: openapi.Response(
+            description="Bad Request", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청에 따른 오류 메세지"),
+                }
+            )
+        )
+    }
+}
+
+
+
+historyList_get = {
+    "operation_summary" : "구독내역 목록 조회",
+    "operation_id" : '구독내역',
+    "manual_parameters" : [
         openapi.Parameter(
             "page",
             openapi.IN_QUERY,
