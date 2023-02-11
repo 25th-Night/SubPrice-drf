@@ -20,9 +20,9 @@ class SignUpView(APIView):
         ## 내용
         
         ### Request Body
-            - email : 이메일 (ID로 사용됨)
-            - fullname : 이름 혹은 별명
-            - password : 비밀번호
+        - **email** : 이메일 (ID로 사용됨)
+        - **fullname** : 이름 혹은 별명
+        - **password** : 비밀번호
     """
     serializer_class = SignUpSeiralizer
     permission_classes = [AllowAny]
@@ -57,8 +57,8 @@ class LoginView(APIView):
         ## 내용
 
         ### Request Body 
-            - email : 이메일 (ID로 사용됨)
-            - password : 비밀번호
+        - **email** : 이메일 (ID로 사용됨)
+        - **password** : 비밀번호
     """
     serializer_class = LoginSeiralizer
     permission_classes = [AllowAny]
@@ -93,10 +93,10 @@ class MyInfoView(APIView):
         ---
         ## 내용
         ### Response Body
-            - email : 이메일 (ID로 사용됨)
-            - fullname : 이름
-            - phone : 휴대전화
-            - picture : 프로필 사진
+        - **email** : 이메일 (ID로 사용됨)
+        - **fullname** : 이름
+        - **phone** : 휴대전화
+        - **picture** : 프로필 사진
     """
     parser_classes = [MultiPartParser]
     serializer_class = MyInfoSerializer

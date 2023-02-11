@@ -315,7 +315,7 @@ ddayList_get = {
 
 subscriptionList_get = {
     "operation_summary" : "구독정보 목록 조회",
-    "operation_id" : '구독정보',
+    "operation_id" : '구독정보 목록',
     "manual_parameters" : [
         openapi.Parameter(
             "ing",
@@ -346,6 +346,35 @@ subscriptionList_get = {
                 type=openapi.TYPE_OBJECT,
                 properties={
                     'detail': openapi.Schema(type=openapi.TYPE_STRING, description="찾을 수 없습니다."),
+                }
+            )
+        )
+    }
+}
+
+
+subscriptionList_post = {
+    "operation_summary" : "구독정보 등록 요청",
+    "operation_id" : '구독정보 등록',
+    "request_body" : SubscriptionSerializer(many=True),
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING, description="정상"),
+                }
+            )
+        ),
+        422: openapi.Response(
+            description="Not found or Not accessible", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'plan': openapi.Schema(type=openapi.TYPE_STRING, description="서비스 유형 검증 오류 메세지"),
+                    'expire_at': openapi.Schema(type=openapi.TYPE_STRING, description="만료예정일 검증 오류 메세지"),
+                    'company': openapi.Schema(type=openapi.TYPE_STRING, description="결제사 검증 오류 메세지"),
                 }
             )
         )

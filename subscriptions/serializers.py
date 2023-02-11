@@ -5,6 +5,7 @@ from subscriptions.models import Type, Company, Billing, Category, Service, Plan
 from alarms.serializers import AlarmSerializer
 
 import calendar
+from datetime import datetime
 
 class TypeSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
@@ -72,6 +73,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         exclude = ["user", "delete_on", "created_at", "updated_at"]
+        read_only_fields = ['is_active']
 
     def validate(self, data):
         error = {}
@@ -171,6 +173,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             subscription.expire_at = None
         else:
             subscription.expire_at=expire_at
+            if expire_at < datetime.now().date():
+                subscription.is_active = False
 
         subscription.save()
 
@@ -211,6 +215,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             instance.expire_at = None
         else:
             instance.expire_at=expire_at
+            if expire_at < datetime.now().date():
+                instance.is_active = False
 
         instance.save()
 
