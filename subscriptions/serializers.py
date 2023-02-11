@@ -73,6 +73,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscription
         exclude = ["user", "delete_on", "created_at", "updated_at"]
+        read_only_fields = ['is_active']
 
     def validate(self, data):
         error = {}
