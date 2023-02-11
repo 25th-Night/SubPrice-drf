@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
 from subscriptions.openapi import (
     categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get, 
-    subscriptionList_get, subscriptionDetail_get, historyList_get
+    subscriptionList_get, subscriptionList_post, subscriptionDetail_get, historyList_get
 )
 from config.utils import CustomSwaggerAutoSchema
 
@@ -61,7 +61,7 @@ class SubscriptionList(APIView):
             ## 내용
             
             ### Response body
-                - subscription : 구독정보
+            - **subscription** : 구독정보
         """
         ing = self.request.GET.get('ing', None)
 
@@ -80,8 +80,25 @@ class SubscriptionList(APIView):
             serializered_subscription_data = self.serializer_class(subscription_list, many=True).data
             return Response(serializered_subscription_data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_summary=subscriptionList_post["operation_summary"],
+        operation_id=subscriptionList_post["operation_id"],
+        request_body=subscriptionList_post["request_body"], 
+        responses=subscriptionList_post["responses"],
+    ) 
     def post(self, request):
-        subscription_serializer = self.serializer_class(data=request.data, context={'request': request})
+        """
+            # 구독정보 등록을 위한 API
+            ---
+            ## 내용
+            
+            ### Response body
+            - **subscription** : 구독정보
+            
+            ### 참고
+            - **[구독 등록 관련 정보](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=32248500?usp=share_link)**
+        """
+        subscription_serializer = self.serializer_class(data=request.data, context={'request': request}, many=True)
         if subscription_serializer.is_valid():
             subscription_serializer.save()
             return Response({"message": "정상"}, status=status.HTTP_201_CREATED)
@@ -106,7 +123,7 @@ class SubscriptionDetail(APIView):
             ## 내용
             
             ### Response body
-                - subscription : 구독정보
+            - **subscription** : 구독정보
         """
         subscription = get_object_or_404(Subscription, pk=pk, user=request.user, is_active=1, delete_on=0)
         serializered_subscription_data = self.serializer_class(subscription).data
@@ -161,7 +178,7 @@ class SubscriptionHistory(APIView):
             ## 내용
             
             ### Response body
-                - subscription : 구독정보
+            - **subscription** : 구독정보
         """
         sub_list = Subscription.objects.select_related('user', 'plan', 'billing', 'alarm_subscription').filter(user=request.user, delete_on=0)
         sub_now = list(sub_list.filter(is_active=1))
@@ -192,8 +209,8 @@ class CategoryListView(APIView):
         ## 내용
         
         ### Response body
-            - category_type : 카테고리 분류 No.
-            - name : 카테고리 이름
+        - **category_type** : 카테고리 분류 No.
+        - **name** : 카테고리 이름
     """
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]
@@ -217,8 +234,8 @@ class ServiceListView(APIView):
         ## 내용
         
         ### Response body
-            - service_id : 서비스 ID
-            - name : 서비스명
+        - **id** : 서비스 ID
+        - **name** : 서비스명
     """
     serializer_class = ServiceSerializer
     authentication_classes = [JWTAuthentication]
@@ -247,8 +264,8 @@ class PlanListView(APIView):
         ## 내용
         
         ### Response body
-            - service_id : 서비스유형 ID
-            - name : 서비스유형 이름
+        - **id** : 서비스유형 ID
+        - **name** : 서비스유형 이름
     """
     serializer_class = ServiceSerializer
     authentication_classes = [JWTAuthentication]
@@ -286,7 +303,7 @@ def priceData(request):
         ## 내용
         
         ### Response body
-            - price : 서비스유형 가격
+        - **price** : 서비스유형 가격
     """
     plan_id = request.GET.get('plan')
     price = Plan.objects.get(id=plan_id).price
@@ -300,8 +317,8 @@ class TypeListView(APIView):
         ## 내용
         
         ### Response body
-            - method_type : 결제유형 분류 No.
-            - name : 결제유형 이름
+        - **method_type** : 결제유형 분류 No.
+        - **name** : 결제유형 이름
     """
     serializer_class = TypeSerializer
     authentication_classes = [JWTAuthentication]
@@ -325,8 +342,8 @@ class CompanyListView(APIView):
         ## 내용
         
         ### Response body
-            - company_id : 결제사 ID
-            - name : 결제사 이름
+        - **id** : 결제사 ID
+        - **name** : 결제사 이름
     """
     serializer_class = CompanySerializer
     authentication_classes = [JWTAuthentication]
@@ -361,8 +378,8 @@ class AlarmListView(APIView):
         ## 내용
         
         ### Response body
-            - category_type : 메일발송 D-DAY 분류 No.
-            - name : 메일발송 D-DAY 명칭
+        - **d_day** : 메일발송 D-DAY 분류 No.
+        - **name** : 메일발송 D-DAY 명칭
     """
     serializer_class = AlarmSerializer
     authentication_classes = [JWTAuthentication]
