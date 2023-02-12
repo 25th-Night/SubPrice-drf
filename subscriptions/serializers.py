@@ -169,7 +169,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             started_at=started_at,
         )
 
-        if expire_at == '':
+        if expire_at == '' or expire_at == None:
             subscription.expire_at = None
         else:
             subscription.expire_at=expire_at
@@ -211,7 +211,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         instance.billing = billing
         instance.started_at = started_at
 
-        if expire_at == '':
+        if expire_at == '' or expire_at == None:
             instance.expire_at = None
         else:
             instance.expire_at=expire_at
@@ -220,9 +220,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
         instance.save()
 
-        alarm, is_created = Alarm.objects.get_or_create(
-            d_day = d_day,
-            subscription = instance,
-        )
+        alarm = Alarm.objects.get(subscription=instance)
+        alarm.d_day = d_day
+        alarm.save()
 
         return instance
