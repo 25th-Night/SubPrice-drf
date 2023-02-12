@@ -387,10 +387,10 @@ subscriptionDetail_get = {
     "operation_id" : '단일 구독정보',
     "manual_parameters" : [
         openapi.Parameter(
-            "page",
+            "id",
             openapi.IN_PATH,
             description="**구독정보 ID**",
-            type=openapi.TYPE_INTEGER,
+            type=openapi.TYPE_STRING,
             required=True,
         ),
     ],
@@ -405,6 +405,44 @@ subscriptionDetail_get = {
                 type=openapi.TYPE_OBJECT,
                 properties={
                     'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
+                }
+            )
+        )
+    }
+}
+
+
+subscriptionDetail_put = {
+    "operation_summary" : "구독정보 수정",
+    "operation_id" : '단일 구독정보 수정',
+    "manual_parameters" : [
+        openapi.Parameter(
+            "id",
+            openapi.IN_PATH,
+            description="**구독정보 ID**",
+            type=openapi.TYPE_STRING,
+            required=True,
+        ),
+    ],
+    "request_body" : SubscriptionSerializer,
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING, description="정상"),
+                }
+            )
+        ),
+        422: openapi.Response(
+            description="Not found or Not accessible", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'plan': openapi.Schema(type=openapi.TYPE_STRING, description="서비스 유형 검증 오류 메세지"),
+                    'expire_at': openapi.Schema(type=openapi.TYPE_STRING, description="만료예정일 검증 오류 메세지"),
+                    'company': openapi.Schema(type=openapi.TYPE_STRING, description="결제사 검증 오류 메세지"),
                 }
             )
         )

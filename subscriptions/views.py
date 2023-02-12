@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
 from subscriptions.openapi import (
     categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get, 
-    subscriptionList_get, subscriptionList_post, subscriptionDetail_get, historyList_get
+    subscriptionList_get, subscriptionList_post, subscriptionDetail_get, subscriptionDetail_put, historyList_get
 )
 from config.utils import CustomSwaggerAutoSchema
 
@@ -92,9 +92,6 @@ class SubscriptionList(APIView):
             ---
             ## 내용
             
-            ### Response body
-            - **subscription** : 구독정보
-            
             ### 참고
             - **[구독 등록 관련 정보](https://docs.google.com/spreadsheets/d/1MYBc6fn0Xbw7vbK2jpcBYu02jukmI-8emvralamyyW8/edit#gid=32248500?usp=share_link)**
         """
@@ -115,7 +112,7 @@ class SubscriptionDetail(APIView):
         operation_id=subscriptionDetail_get["operation_id"],
         manual_parameters=subscriptionDetail_get["manual_parameters"],
         responses=subscriptionDetail_get["responses"]
-    ) 
+    )
     def get(self, request, pk):
         """
             # 단일 구독정보 조회를 위한 API
@@ -129,13 +126,26 @@ class SubscriptionDetail(APIView):
         serializered_subscription_data = self.serializer_class(subscription).data
         return Response(serializered_subscription_data, status=status.HTTP_200_OK)
 
+    @swagger_auto_schema(
+        operation_summary=subscriptionDetail_put["operation_summary"],
+        operation_id=subscriptionDetail_put["operation_id"],
+        manual_parameters=subscriptionDetail_put["manual_parameters"],
+        request_body=subscriptionDetail_put["request_body"],
+        responses=subscriptionDetail_put["responses"]
+    )
     def put(self, request, pk):
+        """
+            # 단일 구독정보 수정을 위한 API
+            ---
+            ## 내용
+            
+        """
         subscription = get_object_or_404(Subscription, pk=pk, user=request.user, is_active=1, delete_on=0)
         self.check_object_permissions(self.request, subscription)
         subscription_serializer = self.serializer_class(subscription, data=request.data, context={'request': request})
         if subscription_serializer.is_valid():
             subscription_serializer.save()
-            return Response(subscription_serializer.data, status=status.HTTP_200_OK)
+            return Response({"message": "정상"}, status=status.HTTP_200_OK)
         return Response(subscription_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
