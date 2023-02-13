@@ -11,7 +11,7 @@ from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyInfoSerialize
 from rest_framework.decorators import api_view,permission_classes
 
 from drf_yasg.utils import swagger_auto_schema
-from users.openapi import login_post, signup_post, myinfo_get, myinfo_put
+from users.openapi import login_post, signup_post, myinfo_get, myinfo_put, myinfo_patch
 
 class SignUpView(APIView):
     """
@@ -138,7 +138,13 @@ class MyInfoView(APIView):
             serializer.save()
             return Response({"message": "정상"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+    
+    @swagger_auto_schema(
+        operation_summary=myinfo_patch["operation_summary"],
+        operation_id=myinfo_patch["operation_id"],
+        manual_parameters=myinfo_patch["manual_parameters"],
+        responses=myinfo_patch["responses"]
+    )
     def patch(self, request):
         """
             # 내정보 중 특정 데이터 수정을 위한 API
@@ -151,7 +157,6 @@ class MyInfoView(APIView):
         picture = request.GET.get('picture', None)
         if picture == "remove":
             user = User.objects.get(id=request.user.id)
-            print(user)
             user.picture = None
             user.save()
             return Response({"message": "정상"}, status=status.HTTP_200_OK)
