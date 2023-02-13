@@ -64,10 +64,10 @@ class LoginSeiralizer(serializers.Serializer):
 
 class MyInfoSerializer(serializers.Serializer):
 
-    email = serializers.EmailField(required=False)
+    email = serializers.EmailField(required=False, read_only=True)
     fullname = serializers.CharField(required=True)
     phone = serializers.CharField(required=True)
-    picture = serializers.ImageField(use_url=True)
+    picture = serializers.ImageField(use_url=True, required=False)
     password = serializers.CharField(required=True, write_only=True, style={'input_type': 'password'})
 
     def validate(self, data):
