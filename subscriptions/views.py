@@ -16,7 +16,7 @@ from rest_framework.decorators import api_view,permission_classes
 from drf_yasg.utils import swagger_auto_schema
 from subscriptions.openapi import (
     categoryList_get, serviceList_get, planList_get, price_get, typeList_get, companyList_get, ddayList_get, 
-    subscriptionList_get, subscriptionList_post, subscriptionDetail_get, subscriptionDetail_put, historyList_get
+    subscriptionList_get, subscriptionList_post, subscriptionDetail_get, subscriptionDetail_put, historyList_get, historyList_patch
 )
 from config.utils import CustomSwaggerAutoSchema
 
@@ -203,11 +203,22 @@ class SubscriptionHistory(APIView):
         serializered_subscription_data = self.serializer_class(subscription_list, many=True).data
         return Response(serializered_subscription_data, status=status.HTTP_200_OK)
 
-    def put(self, request):
-        list_selected = request.data['list_selected']
-        
-        subscription_list = Subscription.objects.filter(user = request.user, delete_on=False)
-        target_subscription = subscription_list.filter(id__in=list_selected)
+    @swagger_auto_schema(
+        operation_summary=historyList_patch["operation_summary"],
+        operation_id=historyList_patch["operation_id"],
+        manual_parameters=historyList_patch["manual_parameters"],
+        responses=historyList_patch["responses"],
+    ) 
+    def patch(self, request):
+        """
+            # 구독내역 삭제를 위한 API
+            ---
+            ## 내용
+            
+        """
+        id_list = request.GET.get('id')
+        id_list = map(int, id_list.split(','))
+        target_subscription = Subscription.objects.filter(user = request.user, delete_on=False, id__in=id_list)
         target_subscription.update(delete_on=1)
         return Response({"message": "정상"}, status=status.HTTP_200_OK)
 

@@ -478,3 +478,38 @@ historyList_get = {
         )
     }
 }
+
+
+historyList_patch = {
+    "operation_summary" : "구독내역 삭제 ",
+    "operation_id" : '구독내역 삭제',
+    "manual_parameters" : [
+        openapi.Parameter(
+            "id",
+            openapi.IN_QUERY,
+            description="**구독정보 ID**",
+            type=openapi.TYPE_STRING,
+            required=True,
+        ),
+    ],
+    "responses" : {
+        200: openapi.Response(
+            description="Success", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING, description="정상"),
+                }
+            )
+        ),
+        400: openapi.Response(
+            description="Bad Request", 
+            schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(type=openapi.TYPE_STRING, description="잘못된 요청입니다."),
+                }
+            )
+        )
+    }
+}

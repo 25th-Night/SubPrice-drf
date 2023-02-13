@@ -11,7 +11,7 @@ from users.serializers import LoginSeiralizer, SignUpSeiralizer, MyInfoSerialize
 from rest_framework.decorators import api_view,permission_classes
 
 from drf_yasg.utils import swagger_auto_schema
-from users.openapi import login_post, signup_post, myinfo_get
+from users.openapi import login_post, signup_post, myinfo_get, myinfo_put, myinfo_patch
 
 class SignUpView(APIView):
     """
@@ -88,16 +88,6 @@ class LoginView(APIView):
 
 
 class MyInfoView(APIView):
-    """
-        # 내정보 조회를 위한 API
-        ---
-        ## 내용
-        ### Response Body
-        - **email** : 이메일 (ID로 사용됨)
-        - **fullname** : 이름
-        - **phone** : 휴대전화
-        - **picture** : 프로필 사진
-    """
     parser_classes = [MultiPartParser]
     serializer_class = MyInfoSerializer
     authentication_classes = [JWTAuthentication]
@@ -109,25 +99,64 @@ class MyInfoView(APIView):
         responses=myinfo_get["responses"],
     ) 
     def get(self, request):
+        """
+            # 내정보 조회를 위한 API
+            ---
+            ## 내용
+            ### Response Body
+            - **email** : 이메일 (ID로 사용됨)
+            - **fullname** : 이름
+            - **phone** : 휴대전화
+            - **picture** : 프로필 사진
+        """
         info = User.objects.filter(email=request.user)
         serializer = self.serializer_class(info, many=True)
     
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        operation_summary=myinfo_put["operation_summary"],
+        operation_id=myinfo_put["operation_id"],
+        request_body=myinfo_put["request_body"], 
+        responses=myinfo_put["responses"],
+    ) 
     def put(self, request):
+        """
+            # 내정보 수정을 위한 API
+            ---
+            ## 내용
+            ### Response Body
+            - **email** : 이메일 (ID로 사용됨)
+            - **fullname** : 이름
+            - **phone** : 휴대전화
+            - **picture** : 프로필 사진
+        """
         info = User.objects.get(email=request.user)
         serializer = self.serializer_class(info, data=request.data)
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"message": "정상"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+    
+    @swagger_auto_schema(
+        operation_summary=myinfo_patch["operation_summary"],
+        operation_id=myinfo_patch["operation_id"],
+        manual_parameters=myinfo_patch["manual_parameters"],
+        responses=myinfo_patch["responses"]
+    )
     def patch(self, request):
+        """
+            # 내정보 중 특정 데이터 수정을 위한 API
+            ---
+            ## 내용
+            ### Path Parameter
+            - **picture** : 프로필 사진
+            - **withdrawal** : 회원 탈퇴
+        """
         picture = request.GET.get('picture', None)
         if picture == "remove":
             user = User.objects.get(id=request.user.id)
-            print(user)
             user.picture = None
             user.save()
             return Response({"message": "정상"}, status=status.HTTP_200_OK)
