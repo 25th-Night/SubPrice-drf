@@ -10,9 +10,7 @@ class Command(BaseCommand):
     help = "PUSH BILLING DB"
 
     def handle(self, *args, **options):
-        
-    # 각 유저별 5개씩의 결제수단 등록
-        
+
         # 결제유형, 결제사 id 리스트
         pay_type = list(map(str, list(range(1,6))))
         pay_company = list(map(str, list(range(1,58))))
@@ -39,16 +37,17 @@ class Command(BaseCommand):
             elif type_id == '5':
                 company_id = choice(mobile_payment)
             return company_id
-        
-        # 전체 유저 불러오기
-        users = User.objects.all()
-        length = len(users)
-        
-        # 각 유저별로 5개 씩의 결제수단 등록
-        for i in range(length):
+
+        # 대상 유저 지정
+        target = int(input("생성할 대상 유저의 ID를 입력하세요. '0'은 전체 유저를 대상으로 생성합니다. : "))
+
+        # 특정 유저의 결제정보 생성
+        if target != 0:
+
+            # 각 유저별로 5개 씩의 결제수단 추가 등록
             cnt = 0
             while cnt < 5:
-                user_id = users[i].id
+                user_id = target
                 type_id = choice(pay_type)
                 company_id = get_company_id(type_id)
                 
@@ -56,5 +55,26 @@ class Command(BaseCommand):
                                     company_id=company_id, type_id=type_id, user_id=user_id)
                 if is_created == True:
                     cnt += 1
+
+        
+        # 전체 유저의 결제정보 생성
+        elif target == 0:
+            
+            # 전체 유저 불러오기
+            users = User.objects.all()
+            length = len(users)
+            
+            # 각 유저별로 5개 씩의 결제수단 등록
+            for i in range(length):
+                cnt = 0
+                while cnt < 5:
+                    user_id = users[i].id
+                    type_id = choice(pay_type)
+                    company_id = get_company_id(type_id)
+                    
+                    billing_object, is_created = Billing.objects.get_or_create( \
+                                        company_id=company_id, type_id=type_id, user_id=user_id)
+                    if is_created == True:
+                        cnt += 1
                 
         
